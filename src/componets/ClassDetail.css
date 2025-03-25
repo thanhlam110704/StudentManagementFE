@@ -1,0 +1,63 @@
+  .class-detail-container {
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  .class-detail-container h2 {
+    margin-bottom: 16px;
+  }
+  
+  .ag-theme-alpine {
+    width: 100%;
+  }
+  
+  .class-detail-container .ant-descriptions-item-label {
+    width: 150px ;
+    font-weight: bold;
+  }
+
+  :where(.css-dev-only-do-not-override-tjsggz).ant-descriptions.ant-descriptions-bordered 
+  >.ant-descriptions-view .ant-descriptions-row {
+      border-bottom: 1px solid #babfc7; /* Đổi màu border */
+  }
+  :where(.css-dev-only-do-not-override-tjsggz).ant-descriptions.ant-descriptions-bordered >.ant-descriptions-view {
+    border: 1px solid #babfc7;
+  }
+  
+  .modal-content {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .class-info-table {
+    max-width: 60%; 
+  }
+
+
+  .class-info-table .ant-descriptions-view .ant-descriptions-row{
+    border-radius: 6px;
+  }
+  
+  
+  .header-container {
+    display: flex;
+    align-items: center;
+    gap: 10px; 
+  }
+
+  .back-button {
+    height: 36px;
+    display: flex;
+    align-items: center; 
+    justify-content: center;
+  }
+
+  .class-detail-container .ant-descriptions-item-label {
+   
+    font-weight: bold;
+  }
+  
+ 
+  

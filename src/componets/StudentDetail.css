@@ -1,0 +1,39 @@
+/* Căn chỉnh padding và giới hạn chiều rộng của trang */
+.student-detail-container {
+    padding: 20px;
+    max-width: 100%;
+  }
+  
+  /* Tiêu đề */
+  .student-detail-container h2 {
+    margin-bottom: 16px;
+  }
+  
+  /* Căn chỉnh danh sách mô tả */
+  .student-detail-container .ant-descriptions-item-label {
+    width: 150px ;
+    font-weight: bold;
+  }
+
+  .s
+  
+  :where(.css-dev-only-do-not-override-tjsggz).ant-descriptions.ant-descriptions-bordered 
+  >.ant-descriptions-view .ant-descriptions-row {
+      border-bottom: 1px solid #babfc7; /* Đổi màu border */
+  }
+  :where(.css-dev-only-do-not-override-tjsggz).ant-descriptions.ant-descriptions-bordered >.ant-descriptions-view {
+    border: 1px solid #babfc7;
+  }
+  /* AG Grid */
+  .student-detail-container .ag-theme-alpine {
+    height: 400px;
+    max-width: 100%;
+  }
+
+  .student-info-table {
+    max-width: 60%; 
+  }
+  
+  
+  
+  
