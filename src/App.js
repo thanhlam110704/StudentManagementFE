@@ -1,29 +1,41 @@
 import React from "react";
-import StudentTable from "./componets/StudentTable";
-import ClassTable from "./componets/ClassTable";
-import MenuComponent from "./componets/MenuComponent";
-import StudentDetail from "./componets/StudentDetail";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import ClassDetail from "./componets/ClassDetail";
+import { Layout } from "antd";
+import MenuComponent from "./components/common/MenuComponent";
+import StudentTable from "./pages/Student/StudentTable";
+import ClassTable from "./pages/Class/ClassTable";
+import StudentDetail from "./pages/Student/StudentDetail";
+import ClassDetail from "./pages/Class/ClassDetail";
+import "./styles/app.css";
+
+const { Content } = Layout;
 
 const App = () => {
   return (
     <Router>
-      <div style={{ display: "flex" }}>
+      <Layout style={{ minHeight: "100vh" }}>
         <MenuComponent />
-        <div style={{ maxWidth: "auto", margin: "auto",marginTop: "0",  marginLeft:"40px", padding: 10, flex: 1 }}>
-          <Routes>
-            <Route path="/student" element={<StudentTable />}  />
-            <Route path="/students/:id" element={<StudentDetail />} />
-            <Route path="/class" element={<ClassTable />} />
-            <Route path="/classes/:id" element={<ClassDetail />} />
-            <Route path="/" element={<h2>Chào Mừng Đến Với Hệ Thống Quản Lý</h2>} />
-          </Routes>
-        </div>
-      </div>
+        <Layout className="site-layout">
+          <Content className="app-content">
+            <Routes>
+              <Route path="/student" element={<StudentTable />} />
+              <Route path="/students/:id" element={<StudentDetail />} />
+              <Route path="/class" element={<ClassTable />} />
+              <Route path="/classes/:id" element={<ClassDetail />} />
+              <Route 
+                path="/" 
+                element={
+                  <div className="welcome-container">
+                    <h2>Welcom To Management System</h2>
+                  </div>
+                } 
+              />
+            </Routes>
+          </Content>
+        </Layout>
+      </Layout>
     </Router>
   );
 };
 
 export default App;
-

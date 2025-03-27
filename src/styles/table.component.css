@@ -1,0 +1,55 @@
+.table-container {
+    padding: 20px;
+    margin-left: 100px;
+    margin-right: 100px;
+    max-width: 74%;
+  }
+  
+  .table-container h2 {
+    margin-bottom: 16px;
+    font-size: 24px;
+  }
+  
+  .header {
+    align-items: center;
+    margin-bottom: 16px;
+  }
+  
+  .add-button {
+    margin-bottom: 16px;
+  }
+  
+  
+  .action-button {
+    margin-right: 8px;
+  }
+  
+  .action-button.info {
+    color: #1890ff;
+    border-color: #1890ff;
+  }
+  
+  .action-button.edit {
+    color: #faad14;
+    border-color: #faad14;
+  }
+  
+  .action-button.delete {
+    color: #ff4d4f;
+    border-color: #ff4d4f;
+  }
+  
+  .ag-theme-alpine {
+    width: 100%;
+    height: calc(100vh - 200px);
+  }
+  
+  .modal-form .ant-input,
+  .modal-form .ant-picker {
+    width: 100%;
+  }
+  
+  .modal-form .ant-radio-group {
+    display: flex;
+    gap: 10px;
+  }

@@ -1,0 +1,48 @@
+.detail-container {
+    padding: 20px;
+    margin-left: 100px;
+    margin-right: 100px;
+   
+  }
+  
+  .detail-container h2 {
+    margin-bottom: 16px;
+  }
+  
+  .header-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .back-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .info-table {
+    max-width: 60%;
+    border-radius: 6px;
+  }
+  
+  .detail-container .ant-descriptions-item-label {
+    width: 150px;
+    font-weight: bold;
+  }
+  
+  .detail-container .ant-descriptions-bordered > .ant-descriptions-view,
+  .detail-container .ant-descriptions-bordered > .ant-descriptions-view .ant-descriptions-row {
+    border-color: #babfc7;
+  }
+  
+  
+  .ag-theme-alpine {
+    height: 400px;
+    width: 100%;
+  }
+  
+  .ant-tabs {
+    margin-top: 16px;
+  }

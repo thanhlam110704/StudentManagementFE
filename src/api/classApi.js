@@ -1,20 +1,39 @@
 import axios from "axios";
 
-const API_URL = "https://localhost:7063/api/Class";
+const API_URL = "https://localhost:7063/api";
+export const fetchClasses = async () => {
+  const response = await axios.get(`${API_URL}/Class`);
+  return response.data;
+};
 
-export const getClasses = async () => {
-  const response = await axios.get(API_URL);
+export const fetchAvailableClasses = async (currentClasses = []) => {
+  const response = await axios.get(`${API_URL}/Class`);
+  return response.data.filter(
+    cls => !currentClasses.some(c => c.id === cls.id)
+  );
+};
+
+export const fetchClassDetail = async (id) => {
+  const response = await axios.get(`${API_URL}/Class/${id}`);
+  return response.data;
+};
+
+export const fetchClassStudents = async (id) => {
+  const response = await axios.get(`${API_URL}/ClassStudent/class/${id}`);
   return response.data;
 };
 
 export const createClass = async (classData) => {
-  return await axios.post(API_URL, classData);
+  const response = await axios.post(`${API_URL}/Class`, classData);
+  return response.data;
 };
 
 export const updateClass = async (id, classData) => {
-  return await axios.put(`${API_URL}/${id}`, classData);
+  const response = await axios.put(`${API_URL}/Class/${id}`, classData);
+  return response.data;
 };
 
 export const deleteClass = async (id) => {
-  return await axios.delete(`${API_URL}/${id}`);
+  await axios.delete(`${API_URL}/Class/${id}`);
 };
+
