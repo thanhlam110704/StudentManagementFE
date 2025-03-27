@@ -1,18 +1,16 @@
 import React from "react";
 import { Tabs } from "antd";
 
-const { TabPane } = Tabs;
-
-const DetailTabs = ({ items, defaultActiveKey = "1" }) => {
+const DetailTabs = ({ items, activeKey, onChange }) => {
   return (
-    <Tabs defaultActiveKey={defaultActiveKey}>
-      {items.map(({ key, label, children }) => (
-        <TabPane tab={label} key={key} forceRender={false}>
-          {children}
-        </TabPane>
-      ))}
-    </Tabs>
+    <Tabs
+      activeKey={activeKey} 
+      onChange={onChange} 
+      items={items}
+    />
   );
 };
 
 export default DetailTabs;
+
+
