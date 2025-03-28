@@ -19,9 +19,9 @@ const App = () => {
           <Content className="app-content">
             <Routes>
               <Route path="/student" element={<StudentTable />} />
-              <Route path="/students/:id" element={<StudentDetail />} />
+              <Route path="/student/:id" element={<StudentDetail />} />
               <Route path="/class" element={<ClassTable />} />
-              <Route path="/classes/:id" element={<ClassDetail />} />
+              <Route path="/class/:id" element={<ClassDetail />} />
               <Route 
                 path="/" 
                 element={

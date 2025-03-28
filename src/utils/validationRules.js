@@ -28,42 +28,32 @@ export const nameRule = [
 
   export const capacityRule = [
     { required: true, message: "Please input capacity number" },
-    { pattern: /^[0-9]+$/, message: "Capacity must be a valid number" }
+    { pattern: /^[0-9]+$/, message: "Capacity must be a valid number greater than 0" }
   ];
   
-  export const startDateRule = {
-    validator(_, value, { getFieldValue }) {
-      if (!value) {
-        return Promise.reject(new Error("Please select a start date"));
-      }
-  
-      const today = dayjs().startOf("day");
-      const endDate = getFieldValue("endDate");
-  
-      if (value.isBefore(today)) {
-        return Promise.reject(new Error("Start date must be today or later"));
-      }
-  
-      if (endDate && value.isAfter(endDate)) {
-        return Promise.reject(new Error("Start date must be before end date"));
-      }
-  
-      return Promise.resolve();
+  export const startDateRule = ({ getFieldValue }) => [
+    { required: true, message: "Please input start date" },
+    {
+      validator(_, value) {
+        const endDate = getFieldValue("endDate");
+        if (!endDate || dayjs(value).isBefore(dayjs(),)) {
+          return Promise.resolve();
+        }
+        return Promise.reject(new Error("Start Date must be before End Date"));
+      },
     },
-  };
+  ];
   
-  export const endDateRule = {
-    validator(_, value, { getFieldValue }) {
-      if (!value) {
-        return Promise.reject(new Error("Please select an end date"));
-      }
-  
-      const startDate = getFieldValue("startDate");
-  
-      if (startDate && value.isBefore(startDate)) {
-        return Promise.reject(new Error("End date must be after start date"));
-      }
-  
-      return Promise.resolve();
+  export const endDateRule = ({ getFieldValue }) => [
+    { required: true, message: "Please input end date" },
+    {
+      validator(_, value) {
+        const startDate = getFieldValue("startDate");
+        if (!startDate || dayjs(value).isAfter(dayjs(startDate))) {
+          return Promise.resolve();
+        }
+        return Promise.reject(new Error("End Date must be after Start Date"));
+      },
     },
-  };
+  ];
+  

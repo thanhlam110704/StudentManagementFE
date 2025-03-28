@@ -21,7 +21,7 @@ const StudentDetailList = ({ studentId, classes, refreshClasses }) => {
     }
   };
 
-  // Cấu hình cột cho bảng lớp học
+  
   const columnDefs = [
     { headerName: "ID", field: "id", width: 100 },
     { headerName: "Class Name", field: "name", width: 160 },
@@ -82,12 +82,9 @@ const StudentDetailList = ({ studentId, classes, refreshClasses }) => {
         Add Class
       </Button>
 
-      {classes.length ? (
+      {
         <AgGridTable rowData={classes} columnDefs={columnDefs} />
-      ) : (
-        <p>Loading...</p>
-      )}
-
+      }
       <AddClassModal
         studentId={studentId}
         availableClasses={availableClasses}

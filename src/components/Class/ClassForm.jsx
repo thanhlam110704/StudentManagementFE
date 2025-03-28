@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Row, Col,Form, Input, DatePicker, message } from "antd";
+import { Col, Row, Form, Input, DatePicker, Button, message } from "antd";
 import dayjs from "dayjs";
 import { createClass, updateClass } from "../../api/classApi";
 import { nameRule, capacityRule ,startDateRule, endDateRule} from "../../utils/validationRules";
@@ -63,13 +63,14 @@ const ClassForm = ({ initialValues, onSuccess }) => {
         <Input type="number" />
       </Form.Item>
 
+      
+
       <Row gutter={16}> 
         <Col span={12}>
           <Form.Item 
             name="startDate" 
             label="Start Date" 
-            rules={[startDateRule]}
-          >
+            rules={startDateRule({ getFieldValue: form.getFieldValue })}>
             <DatePicker format="DD/MM/YYYY" style={{ width: "100%" }} />
           </Form.Item>
         </Col>
@@ -78,12 +79,17 @@ const ClassForm = ({ initialValues, onSuccess }) => {
           <Form.Item 
             name="endDate" 
             label="End Date" 
-            rules={[endDateRule]}
-          >
+            rules={endDateRule({ getFieldValue: form.getFieldValue })}>
             <DatePicker format="DD/MM/YYYY" style={{ width: "100%" }} />
           </Form.Item>
         </Col>
       </Row>
+
+      <Form.Item>
+        <Button type="primary" htmlType="submit" loading={loading}>
+          {initialValues ? "Update" : "Create"}
+        </Button>
+      </Form.Item>
     </Form>
   );
 };
