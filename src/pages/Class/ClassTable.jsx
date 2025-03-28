@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo ,useRef} from "react";
 import { Button, Modal, Popconfirm, message } from "antd";
 import { PlusOutlined, EditOutlined, DeleteOutlined, InfoOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
@@ -14,10 +14,13 @@ const ClassTable = () => {
   const [editingClass, setEditingClass] = useState(null);
   const [loading, setLoading] = useState(false); 
   const navigate = useNavigate();
-
+  const hasFetched = useRef(false);
   useEffect(() => {
-    loadClasses();
-  }, []);
+      if (!hasFetched.current) {
+        loadClasses();
+        hasFetched.current = true;
+      }
+    }, []);
 
   const loadClasses = async () => {
     try {
