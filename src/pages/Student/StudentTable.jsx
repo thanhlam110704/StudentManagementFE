@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 
 import AgGridTable from "../../components/common/AgGridTable";
 import StudentForm from "../../components/Student/StudentForm";
-import { fetchStudents, deleteStudent } from "../../api/studentApi";
+import { getStudents, getStudentDetail, deleteStudent } from "../../api/studentApi";
 import { formatDate } from "../../utils/dateUtils";
 import "../../styles/table.component.css";
 
@@ -13,6 +13,7 @@ const StudentTable = () => {
   const [students, setStudents] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingStudent, setEditingStudent] = useState(null);
+  const [loading, setLoading] = useState(false); // Thêm state loading
   const navigate = useNavigate();
 
   const hasFetched = useRef(false); // Tránh gọi API nhiều lần
@@ -26,10 +27,23 @@ const StudentTable = () => {
 
   const loadStudents = async () => {
     try {
-      const data = await fetchStudents();
+      const data = await getStudents();
       setStudents(data);
     } catch (error) {
       message.error("Failed to load students");
+    }
+  };
+
+  const handleEdit = async (id) => {
+    try {
+      setLoading(true); // Bắt đầu loading
+      const data = await getStudentDetail(id);
+      setEditingStudent(data);
+      setIsModalOpen(true);
+    } catch (error) {
+      message.error("Failed to load student details");
+    } finally {
+      setLoading(false); // Kết thúc loading
     }
   };
 
@@ -52,7 +66,7 @@ const StudentTable = () => {
       {
         headerName: "Gender",
         field: "gender",
-        width: 140,
+        width: 120,
         valueGetter: (params) => (params.data.gender ? "Male" : "Female"),
         filter: "agSetColumnFilter",
         filterParams: {
@@ -62,6 +76,18 @@ const StudentTable = () => {
       {
         headerName: "Birth Date",
         field: "dateOfBirth",
+        valueFormatter: (params) => formatDate(params.value),
+        width: 140,
+      },
+      {
+        headerName: "Created At",
+        field: "createdAt",
+        valueFormatter: (params) => formatDate(params.value),
+        width: 140,
+      },
+      {
+        headerName: "Updated At",
+        field: "updatedAt",
         valueFormatter: (params) => formatDate(params.value),
         width: 140,
       },
@@ -78,11 +104,9 @@ const StudentTable = () => {
             />
             <Button
               icon={<EditOutlined />}
-              onClick={() => {
-                setEditingStudent(params.data);
-                setIsModalOpen(true);
-              }}
+              onClick={() => handleEdit(params.data.id)}
               className="action-button edit"
+              loading={loading} // Thêm trạng thái loading
             />
             <Popconfirm
               title="Are you sure to delete this student?"
@@ -94,7 +118,7 @@ const StudentTable = () => {
         ),
       },
     ],
-    [navigate]
+    [navigate, loading] 
   );
 
   return (

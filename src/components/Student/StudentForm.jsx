@@ -2,7 +2,7 @@ import React from "react";
 import { Form, Input, DatePicker, Button, Radio, message } from "antd";
 import dayjs from "dayjs";
 import { createStudent, updateStudent } from "../../api/studentApi";
-import { nameRule, emailRule, phoneRule } from "../../utils/validationRules";
+import { nameRule, emailRule, phoneRule,dateOfBirthRule } from "../../utils/validationRules";
 
 const StudentForm = ({ initialValues, onSuccess }) => {
   const [form] = Form.useForm();
@@ -66,7 +66,7 @@ const StudentForm = ({ initialValues, onSuccess }) => {
         </Radio.Group>
       </Form.Item>
 
-      <Form.Item name="dateOfBirth" label="Birth Date">
+      <Form.Item name="dateOfBirth" label="Birth Date" rules={dateOfBirthRule}>
         <DatePicker format="DD/MM/YYYY" style={{ width: "100%" }} />
       </Form.Item>
 

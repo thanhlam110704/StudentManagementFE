@@ -1,19 +1,22 @@
-import React from "react";
-import { Form, Input, DatePicker, Button, message } from "antd";
+import React, { useEffect, useState } from "react";
+import { Row, Col,Form, Input, DatePicker, message } from "antd";
 import dayjs from "dayjs";
 import { createClass, updateClass } from "../../api/classApi";
+import { nameRule, capacityRule ,startDateRule, endDateRule} from "../../utils/validationRules";
 
 const ClassForm = ({ initialValues, onSuccess }) => {
   const [form] = Form.useForm();
-  const [loading, setLoading] = React.useState(false);
+  const [loading, setLoading] = useState(false);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (initialValues) {
       form.setFieldsValue({
         ...initialValues,
-        startDate: dayjs(initialValues.startDate),
-        endDate: dayjs(initialValues.endDate),
+        startDate: initialValues.startDate ? dayjs(initialValues.startDate) : null,
+        endDate: initialValues.endDate ? dayjs(initialValues.endDate) : null,
       });
+    } else {
+      form.resetFields();
     }
   }, [initialValues, form]);
 
@@ -22,8 +25,8 @@ const ClassForm = ({ initialValues, onSuccess }) => {
       setLoading(true);
       const formattedValues = {
         ...values,
-        startDate: values.startDate.format("YYYY-MM-DD"),
-        endDate: values.endDate.format("YYYY-MM-DD"),
+        startDate: values.startDate?.format("YYYY-MM-DD"),
+        endDate: values.endDate?.format("YYYY-MM-DD"),
       };
 
       if (initialValues) {
@@ -47,7 +50,7 @@ const ClassForm = ({ initialValues, onSuccess }) => {
       <Form.Item
         name="name"
         label="Class Name"
-        rules={[{ required: true, message: "Please input class name" }]}
+        rules={nameRule}
       >
         <Input />
       </Form.Item>
@@ -55,32 +58,32 @@ const ClassForm = ({ initialValues, onSuccess }) => {
       <Form.Item
         name="capacity"
         label="Capacity"
-        rules={[{ required: true, message: "Please input capacity" }]}
+        rules={capacityRule}
       >
-        <Input type="number" min={1} />
+        <Input type="number" />
       </Form.Item>
 
-      <Form.Item
-        name="startDate"
-        label="Start Date"
-        rules={[{ required: true, message: "Please select start date" }]}
-      >
-        <DatePicker format="DD/MM/YYYY" style={{ width: "100%" }} />
-      </Form.Item>
+      <Row gutter={16}> 
+        <Col span={12}>
+          <Form.Item 
+            name="startDate" 
+            label="Start Date" 
+            rules={[startDateRule]}
+          >
+            <DatePicker format="DD/MM/YYYY" style={{ width: "100%" }} />
+          </Form.Item>
+        </Col>
 
-      <Form.Item
-        name="endDate"
-        label="End Date"
-        rules={[{ required: true, message: "Please select end date" }]}
-      >
-        <DatePicker format="DD/MM/YYYY" style={{ width: "100%" }} />
-      </Form.Item>
-
-      <Form.Item>
-        <Button type="primary" htmlType="submit" loading={loading}>
-          {initialValues ? "Update" : "Create"}
-        </Button>
-      </Form.Item>
+        <Col span={12}>
+          <Form.Item 
+            name="endDate" 
+            label="End Date" 
+            rules={[endDateRule]}
+          >
+            <DatePicker format="DD/MM/YYYY" style={{ width: "100%" }} />
+          </Form.Item>
+        </Col>
+      </Row>
     </Form>
   );
 };

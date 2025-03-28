@@ -1,22 +1,22 @@
 import axios from "axios";
 
 const API_URL = "https://localhost:7063/api";
-export const fetchStudents = async () => {
+export const getStudents = async () => {
   const response = await axios.get(`${API_URL}/Student`);
   return response.data;
 };
 
-export const fetchStudentDetail = async (id) => {
-  const response = await axios.get(`${API_URL}/Student/${id}`);
-  return response.data;
-};
+  export const getStudentDetail = async (id) => {
+    const response = await axios.get(`${API_URL}/Student/${id}`);
+    return response.data;
+  };
 
-export const fetchStudentClasses = async (id) => {
+export const getClassesListofStudent = async (id) => {
   const response = await axios.get(`${API_URL}/ClassStudent/student/${id}`);
   return response.data;
 };
 
-export const fetchAvailableStudents = async () => {
+export const getAvailableStudents = async () => {
   const response = await axios.get(`${API_URL}/Student`);
   return response.data;
 };

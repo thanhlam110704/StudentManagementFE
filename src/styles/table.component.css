@@ -1,8 +1,9 @@
 .table-container {
     padding: 20px;
-    margin-left: 100px;
-    margin-right: 100px;
-    max-width: 74%;
+    padding-left: 10px;
+    margin-left: 50px;
+    margin-right: 50px;
+    max-width: 100%;
   }
   
   .table-container h2 {

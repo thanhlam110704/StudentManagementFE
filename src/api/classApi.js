@@ -1,24 +1,24 @@
 import axios from "axios";
 
 const API_URL = "https://localhost:7063/api";
-export const fetchClasses = async () => {
+export const getClasses = async () => {
   const response = await axios.get(`${API_URL}/Class`);
   return response.data;
 };
 
-export const fetchAvailableClasses = async (currentClasses = []) => {
+export const getAvailableClasses = async (currentClasses = []) => {
   const response = await axios.get(`${API_URL}/Class`);
   return response.data.filter(
     cls => !currentClasses.some(c => c.id === cls.id)
   );
 };
 
-export const fetchClassDetail = async (id) => {
+export const getClassDetail = async (id) => {
   const response = await axios.get(`${API_URL}/Class/${id}`);
   return response.data;
 };
 
-export const fetchClassStudents = async (id) => {
+export const getStudentsListofClass = async (id) => {
   const response = await axios.get(`${API_URL}/ClassStudent/class/${id}`);
   return response.data;
 };
