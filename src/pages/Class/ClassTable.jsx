@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo ,useRef} from "react";
+import React, { useState, useEffect, useMemo ,useRef, useCallback} from "react";
 import { Button, Modal, Popconfirm, message } from "antd";
 import { PlusOutlined, EditOutlined, DeleteOutlined, InfoOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
@@ -15,21 +15,23 @@ const ClassTable = () => {
   const [loading, setLoading] = useState(false); 
   const navigate = useNavigate();
   const hasFetched = useRef(false);
-  useEffect(() => {
-      if (!hasFetched.current) {
-        loadClasses();
-        hasFetched.current = true;
-      }
-    }, []);
 
-  const loadClasses = async () => {
+
+  const loadClasses = useCallback(async () => {
     try {
       const data = await getClasses();
       setClasses(data);
     } catch (error) {
       message.error("Failed to load classes");
     }
-  };
+  }, []);
+  
+  useEffect(() => {
+    if (!hasFetched.current) {
+      loadClasses();
+      hasFetched.current = true;
+    }
+  }, [loadClasses]);
 
   const handleEdit = async (id) => {
     setLoading(true);
@@ -44,7 +46,7 @@ const ClassTable = () => {
     }
   };
 
-  const handleDelete = async (id) => {
+  const handleDelete = useCallback(async (id) => {
     try {
       await deleteClass(id);
       message.success("Class deleted successfully");
@@ -52,7 +54,7 @@ const ClassTable = () => {
     } catch (error) {
       message.error("Failed to delete class");
     }
-  };
+  }, [loadClasses]); 
 
   const columnDefs = useMemo(() => [
     { headerName: "ID", field: "id", width: 100 },
@@ -108,7 +110,7 @@ const ClassTable = () => {
         </div>
       ),
     },
-  ], [navigate, loading]);
+  ], [navigate, loading,handleDelete]);
 
   return (
     <div className="table-container">

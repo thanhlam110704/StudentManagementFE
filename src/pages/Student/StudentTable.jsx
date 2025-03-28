@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from "react";
+import React, { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { Button, Modal, Popconfirm, message } from "antd";
 import { PlusOutlined, EditOutlined, DeleteOutlined, InfoOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
@@ -18,21 +18,24 @@ const StudentTable = () => {
 
   const hasFetched = useRef(false); // Tránh gọi API nhiều lần
 
-  useEffect(() => {
-    if (!hasFetched.current) {
-      loadStudents();
-      hasFetched.current = true;
-    }
-  }, []);
 
-  const loadStudents = async () => {
+  const loadStudents = useCallback(async () => {
     try {
       const data = await getStudents();
       setStudents(data);
     } catch (error) {
       message.error("Failed to load students");
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    if (!hasFetched.current) {
+      loadStudents();
+      hasFetched.current = true;
+    }
+  }, [loadStudents]);
+
+  
 
   const handleEdit = async (id) => {
     try {
@@ -47,7 +50,7 @@ const StudentTable = () => {
     }
   };
 
-  const handleDelete = async (id) => {
+  const handleDelete = useCallback(async (id) => {
     try {
       await deleteStudent(id);
       message.success("Student deleted successfully");
@@ -55,7 +58,7 @@ const StudentTable = () => {
     } catch (error) {
       message.error("Failed to delete student");
     }
-  };
+  }, [loadStudents]);
 
   const columnDefs = useMemo(
     () => [
@@ -118,7 +121,7 @@ const StudentTable = () => {
         ),
       },
     ],
-    [navigate, loading] 
+    [navigate, loading, handleDelete] 
   );
 
   return (
