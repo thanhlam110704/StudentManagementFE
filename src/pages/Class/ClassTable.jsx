@@ -92,7 +92,7 @@ const ClassTable = () => {
         <div className="action-buttons">
           <Button
             icon={<InfoOutlined />}
-            onClick={() => navigate(`/class/${params.data.id}`)}
+            onClick={() => navigate(`/class/${params.data.id}/InfomationClass`)}
             className="action-button info"
           />
           <Button

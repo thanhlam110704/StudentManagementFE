@@ -1,27 +1,61 @@
-import React, { useState } from "react";
-import { Button, Popconfirm } from "antd";
+import React, { useState, useEffect, useCallback, useRef } from "react";
+import { Button, Popconfirm, message } from "antd";
 import { PlusOutlined, DeleteOutlined } from "@ant-design/icons";
 import AgGridTable from "../../components/common/AgGridTable";
 import AddClassModal from "../../components/Student/AddClassModal";
-import { getAvailableClasses } from "../../api/classApi";
-import { removeStudentFromClass } from "../../api/classStudentApi";
+import { fetchAvailableClasses, removeStudentFromClass } from "../../api/classStudentApi";
 import { formatDate } from "../../utils/dateUtils";
+import { getClassesListofStudent } from "../../api/studentApi";
 
-const StudentDetailList = ({ studentId, classes, refreshClasses }) => {
+const StudentDetailList = ({ studentId}) => {
+  const [classes, setClasses] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [availableClasses, setAvailableClasses] = useState([]);
+  const hasFetched = useRef(false);
 
-  // Hàm lấy danh sách lớp học có thể thêm vào
-  const loadAvailableClasses = async () => {
+  const loadAvailableClasses = useCallback(async () => {
     try {
-      const data = await getAvailableClasses ();
+      const data = await fetchAvailableClasses(studentId);
       setAvailableClasses(data);
     } catch (error) {
-      console.error("Failed to load available classes", error);
+      message.error(error.response?.data?.message);
+    }
+  }, [studentId]);
+
+  const refreshClassesList = useCallback(async () => {
+    try {
+      const data = await getClassesListofStudent(studentId);
+      setClasses(data);  
+    } catch (error) {
+      message.error("Lỗi khi tải danh sách lớp học!");
+    }
+  }, [studentId]);
+
+  useEffect(() => {
+    if (!hasFetched.current) {
+      hasFetched.current = true;
+      refreshClassesList();  
+    }
+  }, [refreshClassesList]);
+
+  useEffect(() => {
+    if (isModalOpen) {
+      loadAvailableClasses();
+    }
+  }, [isModalOpen, loadAvailableClasses]);
+  
+
+
+  const handleRemoveStudent = async (classId) => {
+    try {
+      await removeStudentFromClass(studentId, classId);
+      message.success("Đã xóa sinh viên khỏi lớp thành công!");
+      refreshClassesList();
+    } catch (error) {
+      message.error("Lỗi khi xóa sinh viên khỏi lớp!");
     }
   };
 
-  
   const columnDefs = [
     { headerName: "ID", field: "id", width: 100 },
     { headerName: "Class Name", field: "name", width: 160 },
@@ -57,10 +91,7 @@ const StudentDetailList = ({ studentId, classes, refreshClasses }) => {
       cellRenderer: (params) => (
         <Popconfirm
           title="Are you sure to remove from this class?"
-          onConfirm={async () => {
-            await removeStudentFromClass(studentId, params.data.id);
-            refreshClasses();
-          }}
+          onConfirm={() => handleRemoveStudent(params.data.id)}
         >
           <Button icon={<DeleteOutlined />} danger />
         </Popconfirm>
@@ -75,22 +106,20 @@ const StudentDetailList = ({ studentId, classes, refreshClasses }) => {
         icon={<PlusOutlined />}
         onClick={() => {
           setIsModalOpen(true);
-          loadAvailableClasses();
         }}
         className="add-button"
       >
         Add Class
       </Button>
 
-      {
-        <AgGridTable rowData={classes} columnDefs={columnDefs} />
-      }
+      <AgGridTable rowData={classes} columnDefs={columnDefs} />
+
       <AddClassModal
         studentId={studentId}
         availableClasses={availableClasses}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onSuccess={refreshClasses}
+        onSuccess={refreshClassesList}  
       />
     </>
   );

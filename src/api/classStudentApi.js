@@ -8,20 +8,16 @@ export const addStudentToClass = async (studentId, classId) => {
 };
 
 export const removeStudentFromClass = async (studentId, classId) => {
-  await axios.delete(`${API_URL}/student/${studentId}/class/${classId}`);
+  await axios.delete(`${API_URL}/${studentId}/${classId}`);
 };
 
-export const fetchAvailableClasses = async (studentId, currentClasses = []) => {
-  const response = await axios.get(`${API_URL}/student/${studentId}`);
-  return response.data.filter(
-    (cls) => !currentClasses.some((c) => c.id === cls.id)
-  );
+export const fetchAvailableClasses = async (studentId) => {
+  const response = await axios.get(`${API_URL}/student/${studentId}/classes-not-in-student`);
+  return response.data;
 };
 
-export const fetchAvailableStudents = async (classId, currentStudents = []) => {
-  const response = await axios.get(`${API_URL}/class/${classId}`);
-  return response.data.filter(
-    (ls) => !currentStudents.some((s) => s.id === ls.id)
-  );
+export const fetchAvailableStudents = async (classId) => {
+  const response = await axios.get(`${API_URL}/class/${classId}/students-not-in-class`);
+  return response.data;
 };
 

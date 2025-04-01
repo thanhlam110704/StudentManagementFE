@@ -20,14 +20,14 @@ const AgGridTable = ({
   ...props 
 }) => {
   return (
-    <div className="ag-theme-alpine" style={{ height: "100%", width: "100%" }}>
+    <div className="ag-theme-alpine" >
       <AgGridReact
         rowData={rowData}
         columnDefs={columnDefs}
         defaultColDef={defaultColDef}
         pagination={pagination}
         paginationPageSize={paginationPageSize}
-        paginationPageSizeSelector={[10, 20, 50]}
+        paginationPageSizeSelector={[5,10]}
         domLayout="autoHeight"
         {...props}
       />

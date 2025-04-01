@@ -1,8 +1,28 @@
-import React from "react";
-import { Descriptions } from "antd";
+import React, { useState, useEffect, useRef } from "react";
+import { Descriptions, message } from "antd";
 import { formatDate } from "../../utils/dateUtils";
+import { getStudentDetail } from "../../api/studentApi";
 
-const StudentDetailInfo = ({ studentInfo }) => {
+const StudentDetailInfo = ({ studentId }) => {
+  const [studentInfo, setStudentInfo] = useState(null);
+  const hasFetched = useRef(false);
+
+  useEffect(() => {
+    if (hasFetched.current) return;
+
+    hasFetched.current = true;
+    const fetchStudentDetail = async () => {
+      try {
+        const data = await getStudentDetail(studentId);
+        setStudentInfo(data);
+      } catch (error) {
+        message.error("Failed to load student details.");
+      }
+    };
+
+    fetchStudentDetail();
+  }, [studentId]);
+
   if (!studentInfo) {
     return <p>Loading...</p>;
   }

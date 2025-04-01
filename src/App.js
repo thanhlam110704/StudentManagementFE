@@ -19,9 +19,9 @@ const App = () => {
           <Content className="app-content">
             <Routes>
               <Route path="/student" element={<StudentTable />} />
-              <Route path="/student/:id" element={<StudentDetail />} />
               <Route path="/class" element={<ClassTable />} />
-              <Route path="/class/:id" element={<ClassDetail />} />
+              <Route path="/class/:id/:tab" element={<ClassDetail />} /> {/* Route cho tab lớp học */}
+              <Route path="/student/:id/:tab" element={<StudentDetail />} /> {/* Route cho tab lớp học */}
               <Route 
                 path="/" 
                 element={

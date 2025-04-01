@@ -1,22 +1,56 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { Button, Popconfirm, message } from "antd";
 import { PlusOutlined, DeleteOutlined } from "@ant-design/icons";
 import AgGridTable from "../../components/common/AgGridTable";
 import AddStudentModal from "../../components/Class/AddStudentModal";
-import { getAvailableStudents } from "../../api/studentApi";
-import { removeStudentFromClass } from "../../api/classStudentApi";
+import { fetchAvailableStudents, removeStudentFromClass } from "../../api/classStudentApi";
 import { formatDate } from "../../utils/dateUtils";
+import { getStudentsListofClass } from "../../api/classApi";
 
-const ClassDetailList = ({ classId, students, refreshStudents }) => {
+const ClassDetailList = ({ classId }) => {
+  const [students, setStudents] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [availableStudents, setAvailableStudents] = useState([]);
+  const hasFetched = useRef(false); 
 
-  const loadAvailableStudents = async () => {
+  const loadAvailableStudents = useCallback( async () => {
     try {
-      const data = await getAvailableStudents();
+      const data = await fetchAvailableStudents(classId);
       setAvailableStudents(data);
     } catch (error) {
-      message.error("Failed to load available students.");
+      message.error(error.response?.data?.message);
+    }
+  }, [classId]);
+  
+  const refreshStudents = useCallback(async () => {
+    try {
+      const data = await getStudentsListofClass(classId);
+      setStudents(data);
+    } catch (error) {
+      message.error("Lỗi khi tải danh sách sinh viên!");
+    }
+  }, [classId]);
+
+  useEffect(() => {
+    if (!hasFetched.current) {
+      hasFetched.current = true;
+      refreshStudents();
+    }
+  }, [refreshStudents]);
+
+  useEffect(() => {
+      if (isModalOpen) {
+        loadAvailableStudents();
+      }
+    }, [isModalOpen, loadAvailableStudents]);
+
+  const handleRemoveStudent = async (studentId) => {
+    try {
+      await removeStudentFromClass(classId, studentId);
+      message.success("Đã xóa sinh viên thành công!");
+      refreshStudents();
+    } catch (error) {
+      message.error("Lỗi khi xóa sinh viên!");
     }
   };
 
@@ -56,10 +90,7 @@ const ClassDetailList = ({ classId, students, refreshStudents }) => {
       cellRenderer: (params) => (
         <Popconfirm
           title="Are you sure you want to remove this student?"
-          onConfirm={async () => {
-            await removeStudentFromClass(classId, params.data.id);
-            refreshStudents();
-          }}
+          onConfirm={() => handleRemoveStudent(params.data.id)}
         >
           <Button icon={<DeleteOutlined />} danger />
         </Popconfirm>
@@ -74,7 +105,6 @@ const ClassDetailList = ({ classId, students, refreshStudents }) => {
         icon={<PlusOutlined />}
         onClick={() => {
           setIsModalOpen(true);
-          loadAvailableStudents();
         }}
         className="add-button"
       >

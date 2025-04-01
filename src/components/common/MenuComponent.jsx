@@ -25,12 +25,16 @@ const MenuComponent = () => {
     { key: "", label: "Home", icon: <HomeOutlined /> },
     { key: "class", label: "Class Management", icon: <BookOutlined /> },
     { key: "student", label: "Student Management", icon: <UserOutlined /> },
+    
   ];
 
   const changeTheme = (value) => setTheme(value ? "dark" : "light");
   const handleMenuClick = (e) => navigate(`/${e.key}`);
-  const selectedKey = location.pathname.substring(1) || "";
-
+  const selectedKey = location.pathname.includes("/class")
+    ? "class"
+    : location.pathname.includes("/student")
+    ? "student"
+    : location.pathname.substring(1) || "";
   return (
     <Sider
       collapsible

@@ -1,48 +1,42 @@
-import React, { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
-import { Button, Tabs, message } from "antd";
+import React from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { Button, Tabs } from "antd";
 import { LeftOutlined } from "@ant-design/icons";
 import "../../styles/detail.component.css";
 
-const DetailComponent = ({ id, title, tabs, fetchDetails, fetchList }) => {
+const DetailComponent = ({ title, tabs, activeTab, onTabChange }) => {
   const navigate = useNavigate();
-  const [activeKey, setActiveKey] = useState("1");
-  const [detailInfo, setDetailInfo] = useState(null);
-  const [listData, setListData] = useState([]);
-  const hasFetchedDetail = useRef(false);
-  const hasFetchedList = useRef(false);
+  const location = useLocation();
 
-  useEffect(() => {
-    if (!hasFetchedDetail.current) {
-      hasFetchedDetail.current = true;
-      fetchDetails(id)
-        .then(setDetailInfo)
-        .catch(() => message.error(`Failed to load ${title.toLowerCase()} details.`));
+  // Hàm xác định trang gốc (class hoặc student)
+  const getBackUrl = () => {
+    if (location.pathname.includes("student")) {
+      return "/student";  // Nếu đang ở trang chi tiết sinh viên
+    } else if (location.pathname.includes("class")) {
+      return "/class";  // Nếu đang ở trang chi tiết lớp học
     }
-  }, [id, fetchDetails, title]);
-
-  useEffect(() => {
-    if (activeKey === "2" && !hasFetchedList.current) {
-      hasFetchedList.current = true;
-      fetchList(id)
-        .then(setListData)
-        .catch(() => message.error(`Failed to load ${title.toLowerCase()} list.`));
-    }
-  }, [activeKey, id, fetchList, title]);
+    return "/";  // Nếu không xác định được
+  };
 
   return (
     <div className="detail-container">
       <div className="header-container">
-        <Button onClick={() => navigate(-1)} icon={<LeftOutlined />} className="back-button" />
+        {/* Nút quay lại */}
+        <Button 
+          onClick={() => navigate(getBackUrl())} 
+          icon={<LeftOutlined />} 
+          className="back-button" 
+        />
         <h2>{title} Details</h2>
       </div>
       <Tabs
-        activeKey={activeKey}
-        onChange={setActiveKey}
-        items={[
-          { key: "1", label: `${title} Information`, children: tabs[0](detailInfo) },
-          { key: "2", label: `List of ${title === "Class" ? "Students" : "Classes"}`, children: tabs[1](listData, setListData) }
-        ]}
+        activeKey={activeTab}
+        onChange={onTabChange} // Gọi onTabChange khi tab thay đổi
+        items={tabs.map((tab, index) => ({
+          key: tab.key,
+          label: tab.label,
+          children: tab.component,
+        }))}
       />
     </div>
   );

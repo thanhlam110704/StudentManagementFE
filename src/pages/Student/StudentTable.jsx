@@ -102,7 +102,7 @@ const StudentTable = () => {
           <div className="action-buttons">
             <Button
               icon={<InfoOutlined />}
-              onClick={() => navigate(`/student/${params.data.id}`)}
+              onClick={() => navigate(`/student/${params.data.id}/StudentInformation`)}
               className="action-button info"
             />
             <Button

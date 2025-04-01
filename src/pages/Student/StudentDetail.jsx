@@ -1,30 +1,45 @@
-import React, { useState } from "react";
-import { useParams } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import DetailComponent from "../../components/common/DetailComponent";
 import StudentDetailInfo from "../../pages/Student/StudentDetailInfo";
 import StudentDetailList from "../../pages/Student/StudentDetailList";
-import { getStudentDetail, getClassesListofStudent } from "../../api/studentApi";
 
 const StudentDetail = () => {
-  const { id } = useParams();
-  const [classes, setClasses] = useState([]);
+  const { id, tab } = useParams();  
+  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState(tab); 
+
+ 
+  const handleTabChange = (key) => {
+    setActiveTab(key);
+    navigate(`/student/${id}/${key}`); 
+  };
+
+  const tabs = [
+    {
+      label: "Student Information", 
+      key: "StudentInformation", 
+      component: <StudentDetailInfo studentId={id} /> 
+    },
+    {
+      label: "List of Classes", 
+      key: "ListOfClasses", 
+      component: <StudentDetailList studentId={id} />
+    },
+  ];
+  useEffect(() => {
+      if (tab && tab !== activeTab) {
+        setActiveTab(tab); 
+      }
+    }, [tab, activeTab]);
 
   return (
     <DetailComponent
-      id={id}
       title="Student"
-      fetchDetails={getStudentDetail}
-      fetchList={() => getClassesListofStudent(id).then(setClasses)}
-      tabs={[
-        (studentInfo) => <StudentDetailInfo studentInfo={studentInfo} />, 
-        () => (
-          <StudentDetailList  
-            studentId={id}
-            classes={classes}
-            refreshStudents={() => getClassesListofStudent(id).then(setClasses)}
-          />
-        ),
-      ]}
+      tabs={tabs} 
+      activeTab={activeTab}
+      onTabChange={handleTabChange}
+      baseUrl={`/student/${id}`} 
     />
   );
 };

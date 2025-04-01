@@ -8,9 +8,7 @@ export const getClasses = async () => {
 
 export const getAvailableClasses = async (currentClasses = []) => {
   const response = await axios.get(`${API_URL}/Class`);
-  return response.data.filter(
-    cls => !currentClasses.some(c => c.id === cls.id)
-  );
+  return response.data;
 };
 
 export const getClassDetail = async (id) => {
