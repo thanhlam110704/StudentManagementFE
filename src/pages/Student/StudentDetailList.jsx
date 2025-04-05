@@ -1,31 +1,27 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import { Button, Popconfirm, message } from "antd";
+import { Button, Popconfirm, message, Pagination } from "antd";
 import { PlusOutlined, DeleteOutlined } from "@ant-design/icons";
-import AgGridTable from "../../components/common/AgGridTable";
-import AddClassModal from "../../components/Student/AddClassModal";
+import AddClassModal from "../../pages/Student/AddClassModal";
+import { AgGridReact } from "@ag-grid-community/react"; 
 import { fetchAvailableClasses, removeStudentFromClass } from "../../api/classStudentApi";
-import { formatDate } from "../../utils/dateUtils";
+import { formatDate } from "../../utils/dateConvert";
 import { getClassesListofStudent } from "../../api/studentApi";
 
-const StudentDetailList = ({ studentId}) => {
+const StudentDetailList = ({ studentId }) => {
   const [classes, setClasses] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [availableClasses, setAvailableClasses] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [totalItems, setTotalItems] = useState(0);
   const hasFetched = useRef(false);
 
-  const loadAvailableClasses = useCallback(async () => {
+  // Lấy danh sách lớp học có phân trang
+  const refreshClassesList = useCallback(async (page = 1, size = 10) => {
     try {
-      const data = await fetchAvailableClasses(studentId);
-      setAvailableClasses(data);
-    } catch (error) {
-      message.error(error.response?.data?.message);
-    }
-  }, [studentId]);
-
-  const refreshClassesList = useCallback(async () => {
-    try {
-      const data = await getClassesListofStudent(studentId);
-      setClasses(data);  
+      const data = await getClassesListofStudent(studentId, page, size);
+      setClasses(data.data); // Dữ liệu danh sách lớp
+      setTotalItems(data.totalItems); // Tổng số lớp học
     } catch (error) {
       message.error("Lỗi khi tải danh sách lớp học!");
     }
@@ -34,23 +30,35 @@ const StudentDetailList = ({ studentId}) => {
   useEffect(() => {
     if (!hasFetched.current) {
       hasFetched.current = true;
-      refreshClassesList();  
+      refreshClassesList(currentPage, pageSize);
     }
-  }, [refreshClassesList]);
+  }, [refreshClassesList, currentPage, pageSize]);
 
   useEffect(() => {
     if (isModalOpen) {
-      loadAvailableClasses();
+      (async () => {
+        try {
+          const data = await fetchAvailableClasses(studentId);
+          setAvailableClasses(data);
+        } catch (error) {
+          message.error(error.response?.data?.message);
+        }
+      })();
     }
-  }, [isModalOpen, loadAvailableClasses]);
-  
+  }, [isModalOpen, studentId]);
 
+  // Xử lý khi chuyển trang
+  const handlePageChange = (page, size) => {
+    setCurrentPage(page);
+    setPageSize(size);
+    refreshClassesList(page, size);
+  };
 
   const handleRemoveStudent = async (classId) => {
     try {
       await removeStudentFromClass(studentId, classId);
       message.success("Đã xóa sinh viên khỏi lớp thành công!");
-      refreshClassesList();
+      refreshClassesList(currentPage, pageSize);
     } catch (error) {
       message.error("Lỗi khi xóa sinh viên khỏi lớp!");
     }
@@ -104,22 +112,31 @@ const StudentDetailList = ({ studentId}) => {
       <Button
         type="primary"
         icon={<PlusOutlined />}
-        onClick={() => {
-          setIsModalOpen(true);
-        }}
-        className="add-button"
+        onClick={() => setIsModalOpen(true)}
+        className="add-button-detail"
       >
         Add Class
       </Button>
+      <AgGridReact className="detail-table" rowData={classes} columnDefs={columnDefs} />
 
-      <AgGridTable rowData={classes} columnDefs={columnDefs} />
+      {/* Thêm phân trang */}
+      <div className="pagination-container-detail">
+        <Pagination
+          current={currentPage}
+          pageSize={pageSize}
+          total={totalItems}
+          showSizeChanger
+          pageSizeOptions={["5", "10", "20", "50"]}
+          onChange={handlePageChange}
+        />
+      </div>
 
       <AddClassModal
         studentId={studentId}
         availableClasses={availableClasses}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onSuccess={refreshClassesList}  
+        onSuccess={() => refreshClassesList(currentPage, pageSize)}
       />
     </>
   );

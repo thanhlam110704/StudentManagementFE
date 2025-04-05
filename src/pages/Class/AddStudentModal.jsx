@@ -1,25 +1,25 @@
 import React, { useState } from "react";
 import { Select, Button, message } from "antd";
-import CustomModal from "../common/CustomModal";
+import CustomModal from "../../components/common/CustomModal";
 import { addStudentToClass } from "../../api/classStudentApi";
 
-const AddClassModal = ({ studentId, availableClasses, isOpen, onClose, onSuccess }) => {
-  const [selectedClass, setSelectedClass] = useState(null);
+const AddStudentModal = ({ classId, availableStudents, isOpen, onClose, onSuccess }) => {
+  const [selectedStudent, setSelectedStudent] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const handleAddClass = async () => {
-    if (!selectedClass) {
-      message.warning("Please select a class");
+  const handleAddStudent = async () => {
+    if (!selectedStudent) {
+      message.warning("Please select a student");
       return;
     }
 
     try {
       setLoading(true);
-      await addStudentToClass(studentId, selectedClass);
+      await addStudentToClass(selectedStudent, classId);
       message.success("Student added to class successfully");
       onSuccess();
       onClose();
-      setSelectedClass(null);
+      setSelectedStudent(null);
     } catch (error) {
       message.error("Failed to add student to class");
     } finally {
@@ -29,7 +29,7 @@ const AddClassModal = ({ studentId, availableClasses, isOpen, onClose, onSuccess
 
   return (
     <CustomModal
-      title="Add Class"
+      title="Add Student to Class"
       open={isOpen}
       onClose={onClose}
       footer={[
@@ -40,23 +40,23 @@ const AddClassModal = ({ studentId, availableClasses, isOpen, onClose, onSuccess
           key="add"
           type="primary"
           loading={loading}
-          onClick={handleAddClass}
+          onClick={handleAddStudent}
         >
-          Add Class
+          Add Student
         </Button>,
       ]}
     >
       <Select
         style={{ width: "100%" }}
-        placeholder="Select a class"
-        onChange={setSelectedClass}
-        options={availableClasses.map(cls => ({
-          value: cls.id,
-          label: cls.name,
+        placeholder="Select a student"
+        onChange={setSelectedStudent}
+        options={availableStudents.map(student => ({
+          value: student.id,
+          label: student.name,
         }))}
       />
     </CustomModal>
   );
 };
 
-export default AddClassModal;
+export default AddStudentModal;

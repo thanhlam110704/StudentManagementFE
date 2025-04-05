@@ -1,4 +1,4 @@
-import React from "react";
+import React  from "react";
 import { AgGridReact } from "@ag-grid-community/react";
 import { ModuleRegistry } from '@ag-grid-community/core';
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
@@ -7,31 +7,30 @@ import "ag-grid-community/styles/ag-theme-alpine.css";
 
 ModuleRegistry.registerModules([ClientSideRowModelModule]);
 
-const AgGridTable = ({ 
-  rowData, 
-  columnDefs, 
-  defaultColDef = {
-    resizable: true,
-    sortable: true,
-    filter: true
-  },
-  pagination = true,
-  paginationPageSize = 10,
-  ...props 
-}) => {
+const AgGridTable = ({ rowData, columnDefs, onSortChange, onFilterChange, sortModel, ...props }) => {
+  const onSortChanged = (event) => {
+      onSortChange(event)
+  }
+
+  const onFilterChanged = (event) => {
+      const filterModel = event.api.getFilterModel();
+      onFilterChange(filterModel);
+  };
+
   return (
-    <div className="ag-theme-alpine" >
-      <AgGridReact
-        rowData={rowData}
-        columnDefs={columnDefs}
-        defaultColDef={defaultColDef}
-        pagination={pagination}
-        paginationPageSize={paginationPageSize}
-        paginationPageSizeSelector={[5,10]}
-        domLayout="autoHeight"
-        {...props}
-      />
-    </div>
+      <div className="ag-theme-alpine">
+          <AgGridReact
+              rowData={rowData}
+              columnDefs={columnDefs}
+              pagination={true}
+              domLayout="autoHeight"
+              suppressPaginationPanel={true}
+              onFilterChanged={onFilterChanged}
+              onSortChanged={onSortChanged}
+              sortModel={sortModel}
+              {...props}
+          />
+      </div>
   );
 };
 

@@ -1,19 +1,22 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import { Button, Popconfirm, message } from "antd";
+import { Button, Popconfirm, message, Pagination } from "antd";
 import { PlusOutlined, DeleteOutlined } from "@ant-design/icons";
-import AgGridTable from "../../components/common/AgGridTable";
-import AddStudentModal from "../../components/Class/AddStudentModal";
+import { AgGridReact } from "@ag-grid-community/react"; 
+import AddStudentModal from "./AddStudentModal";
 import { fetchAvailableStudents, removeStudentFromClass } from "../../api/classStudentApi";
-import { formatDate } from "../../utils/dateUtils";
+import { formatDate } from "../../utils/dateConvert";
 import { getStudentsListofClass } from "../../api/classApi";
 
 const ClassDetailList = ({ classId }) => {
   const [students, setStudents] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [availableStudents, setAvailableStudents] = useState([]);
-  const hasFetched = useRef(false); 
+  const [totalItems, setTotalItems] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const hasFetched = useRef(false);
 
-  const loadAvailableStudents = useCallback( async () => {
+  const loadAvailableStudents = useCallback(async () => {
     try {
       const data = await fetchAvailableStudents(classId);
       setAvailableStudents(data);
@@ -21,11 +24,12 @@ const ClassDetailList = ({ classId }) => {
       message.error(error.response?.data?.message);
     }
   }, [classId]);
-  
-  const refreshStudents = useCallback(async () => {
+
+  const refreshStudents = useCallback(async (page = 1, size = 10) => {
     try {
-      const data = await getStudentsListofClass(classId);
-      setStudents(data);
+      const response = await getStudentsListofClass(classId, page, size);
+      setStudents(response.data);
+      setTotalItems(response.totalItems);
     } catch (error) {
       message.error("Lỗi khi tải danh sách sinh viên!");
     }
@@ -34,24 +38,30 @@ const ClassDetailList = ({ classId }) => {
   useEffect(() => {
     if (!hasFetched.current) {
       hasFetched.current = true;
-      refreshStudents();
+      refreshStudents(currentPage, pageSize);
     }
-  }, [refreshStudents]);
+  }, [refreshStudents, currentPage, pageSize]);
 
   useEffect(() => {
-      if (isModalOpen) {
-        loadAvailableStudents();
-      }
-    }, [isModalOpen, loadAvailableStudents]);
+    if (isModalOpen) {
+      loadAvailableStudents();
+    }
+  }, [isModalOpen, loadAvailableStudents]);
 
   const handleRemoveStudent = async (studentId) => {
     try {
       await removeStudentFromClass(classId, studentId);
       message.success("Đã xóa sinh viên thành công!");
-      refreshStudents();
+      refreshStudents(currentPage, pageSize);
     } catch (error) {
       message.error("Lỗi khi xóa sinh viên!");
     }
+  };
+
+  const handlePageChange = (page, size) => {
+    setCurrentPage(page);
+    setPageSize(size);
+    refreshStudents(page, size);
   };
 
   const columnDefs = [
@@ -106,19 +116,31 @@ const ClassDetailList = ({ classId }) => {
         onClick={() => {
           setIsModalOpen(true);
         }}
-        className="add-button"
+        className="add-button-detail"
       >
         Add Student
       </Button>
 
-      <AgGridTable rowData={students} columnDefs={columnDefs} />
+      <AgGridReact rowData={students} columnDefs={columnDefs} />
+
+      {/* Pagination */}
+      <div className="pagination-container-detail">
+        <Pagination
+          current={currentPage}
+          pageSize={pageSize}
+          total={totalItems}
+          onChange={handlePageChange}
+          showSizeChanger
+        />
+      </div>
+      
 
       <AddStudentModal
         classId={classId}
         availableStudents={availableStudents}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onSuccess={refreshStudents}
+        onSuccess={() => refreshStudents(currentPage, pageSize)}
       />
     </>
   );

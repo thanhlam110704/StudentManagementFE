@@ -1,26 +1,31 @@
-.detail-container {
-    padding: 20px;
+  .detail-container {
+    
     padding-left: 10px;
     margin-left: 50px;
     margin-right: 50px;
     max-width: 100%;
+    
   }
   
+
+  
   .detail-container h2 {
-    margin-bottom: 16px;
+    font-size: 24px;
+    align-items: center;
   }
   
   .header-container {
     display: flex;
     align-items: center;
     gap: 10px;
-    margin-bottom: 16px;
   }
 
   .back-button {
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: 4px 8px;
+    
   }
   
   .info-table {
@@ -38,12 +43,28 @@
     border-color: #babfc7;
   }
   
-  
-  .ag-theme-alpine {
-    height: 400px;
-    width: 100%;
+  .pagination-container-detail{
+    margin-top: 16px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    min-height: 40px;
+    display: flex;
   }
-  
+
+
+  .detail-table {
+    min-height: 250px;
+    width: 100%;
+    flex: 1;
+    max-height: 450px; 
+    overflow-y: auto; 
+  }
+
   .ant-tabs {
     margin-top: 16px;
+  }
+
+  .add-button-detail{
+    margin-bottom: 16px;
   }

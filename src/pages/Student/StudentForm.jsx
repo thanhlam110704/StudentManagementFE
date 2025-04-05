@@ -2,7 +2,7 @@ import React from "react";
 import { Form, Input, DatePicker, Button, Radio, message } from "antd";
 import dayjs from "dayjs";
 import { createStudent, updateStudent } from "../../api/studentApi";
-import { nameRule, emailRule, phoneRule,dateOfBirthRule } from "../../utils/validationRules";
+import { nameRule, emailRule, phoneRule,dateOfBirthRule } from "../../utils/handleValidations";
 
 const StudentForm = ({ initialValues, onSuccess }) => {
   const [form] = Form.useForm();

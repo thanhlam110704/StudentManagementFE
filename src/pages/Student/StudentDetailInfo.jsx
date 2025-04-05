@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Descriptions, message } from "antd";
-import { formatDate } from "../../utils/dateUtils";
+import { formatDate } from "../../utils/dateConvert";
 import { getStudentDetail } from "../../api/studentApi";
 
 const StudentDetailInfo = ({ studentId }) => {

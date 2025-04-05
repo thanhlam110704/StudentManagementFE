@@ -1,23 +1,36 @@
 import axios from "axios";
 
 const API_URL = "https://localhost:7063/api";
-export const getClasses = async () => {
-  const response = await axios.get(`${API_URL}/Class`);
+export const getClasses = async (page = 1, pageSize = 10, filter = {}, sortBy = '', sortDirection = '') => {
+  const params = {
+    Page: page,
+    PageSize: pageSize,
+    SortBy: sortBy, 
+    SortDirection: sortDirection,  
+  };
+
+  if (filter.field && filter.value && filter.operator) {
+    params["filters[field]"] = filter.field;
+    params["filters[value]"] = filter.value;
+    params["filters[operator]"] = filter.operator;
+  }
+  const response = await axios.get(`${API_URL}/Class`, { params });
   return response.data;
+  
 };
 
-export const getAvailableClasses = async (currentClasses = []) => {
-  const response = await axios.get(`${API_URL}/Class`);
-  return response.data;
-};
+
+
 
 export const getClassDetail = async (id) => {
   const response = await axios.get(`${API_URL}/Class/${id}`);
   return response.data;
 };
 
-export const getStudentsListofClass = async (id) => {
-  const response = await axios.get(`${API_URL}/ClassStudent/class/${id}`);
+export const getStudentsListofClass = async (id, page = 1, pageSize = 10) => {
+  const response = await axios.get(`${API_URL}/ClassStudent/class/${id}`,{
+    params: { page, pageSize }, 
+  });
   return response.data;
 };
 
