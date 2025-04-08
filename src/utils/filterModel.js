@@ -35,7 +35,7 @@ export const getFilterModel = (gridApi) => {
             return dateFilters;
         }
 
-        // Xử lý kiểu số
+       
         else if (filterValue.filterType === 'number') {
             const numberFilters = [];
 
