@@ -7,7 +7,7 @@ import { ModuleRegistry } from "@ag-grid-community/core";
 import { ClientSideRowModelModule } from "@ag-grid-community/client-side-row-model";
 import StudentForm from "./StudentForm.jsx";
 import { getStudents, getStudentDetail, deleteStudent } from "../../api/studentApi";
-import { textFilterParams, dateFilterParams } from "../../utils/filterParams.ts";
+import { textFilterParams, dateFilterParams,numberFilterParams } from "../../utils/filterParams.ts";
 import { getFilterModel } from '../../utils/filterModel.js';
 import { formatDate } from "../../utils/dateConvert.js";
 import "../../styles/table.component.css";
@@ -100,15 +100,15 @@ const StudentTable = () => {
   }, [loadStudents]);
 
   const columnDefs = useMemo(() => [
-    { headerName: "ID", field: "id", width: 80 },
+    { headerName: "ID", field: "id", width: 80, sortable: true, filterParams: numberFilterParams },
     { headerName: "Full Name", field: "name", width: 160, filter: true, filterParams: textFilterParams },
-    { headerName: "Email", field: "email", width: 180, filter: true, filterParams: textFilterParams },
-    { headerName: "Phone", field: "phone", width: 140, filter: true, filterParams: textFilterParams },
+    { headerName: "Email", field: "email", width: 160, filter: true, filterParams: textFilterParams },
+    { headerName: "Phone", field: "phone", width: 160, filter: true, filterParams: textFilterParams },
     {
       headerName: "Date of Birth",
       field: "dateOfBirth",
       valueFormatter: (params) => formatDate(params.value),
-      width: 160,
+      width: 150,
       filter: "agDateColumnFilter",
       filterParams: dateFilterParams,
     },
@@ -116,7 +116,7 @@ const StudentTable = () => {
       headerName: "Created At",
       field: "createdAt",
       valueFormatter: (params) => formatDate(params.value),
-      width: 160,
+      width: 150,
       filter: "agDateColumnFilter",
       filterParams: dateFilterParams,
     },
@@ -124,7 +124,7 @@ const StudentTable = () => {
       headerName: "Updated At",
       field: "updatedAt",
       valueFormatter: (params) => formatDate(params.value),
-      width: 160,
+      width: 150,
       filter: "agDateColumnFilter",
       filterParams: dateFilterParams,
     },
@@ -162,7 +162,7 @@ const StudentTable = () => {
         </Button>
       </div>
 
-      <div className="ag-theme-alpine">
+      <div className="ag-theme-alpine" >
         <AgGridReact
           rowData={students}
           columnDefs={columnDefs}

@@ -5,7 +5,7 @@ import { AgGridReact } from "@ag-grid-community/react";
 import AddStudentModal from "./AddStudentModal";
 import { fetchAvailableStudents, removeStudentFromClass } from "../../api/classStudentApi";
 import { getStudentsListofClass } from "../../api/classApi";
-import { textFilterParams, dateFilterParams } from "../../utils/filterParams.ts";
+import { textFilterParams, dateFilterParams,numberFilterParams } from "../../utils/filterParams.ts";
 import { getFilterModel } from '../../utils/filterModel.js';
 import { formatDate } from "../../utils/dateConvert.js";
 
@@ -96,15 +96,15 @@ const ClassDetailList = ({ classId }) => {
   };
 
   const columnDefs = useMemo(() => [
-      { headerName: "ID", field: "id", width: 80 },
+      { headerName: "ID", field: "id", width: 80, width: 140, sortable: true, filterParams: numberFilterParams },
       { headerName: "Full Name", field: "name", width: 160, filter: true, filterParams: textFilterParams },
-      { headerName: "Email", field: "email", width: 180, filter: true, filterParams: textFilterParams },
-      { headerName: "Phone", field: "phone", width: 140, filter: true, filterParams: textFilterParams },
+      { headerName: "Email", field: "email", width: 160, filter: true, filterParams: textFilterParams },
+      { headerName: "Phone", field: "phone", width: 160, filter: true, filterParams: textFilterParams },
       {
         headerName: "Date of Birth",
         field: "dateOfBirth",
         valueFormatter: (params) => formatDate(params.value),
-        width: 160,
+        width: 150,
         filter: "agDateColumnFilter",
         filterParams: dateFilterParams,
       },
@@ -112,7 +112,7 @@ const ClassDetailList = ({ classId }) => {
         headerName: "Created At",
         field: "createdAt",
         valueFormatter: (params) => formatDate(params.value),
-        width: 160,
+        width: 150,
         filter: "agDateColumnFilter",
         filterParams: dateFilterParams,
       },
@@ -120,14 +120,14 @@ const ClassDetailList = ({ classId }) => {
         headerName: "Updated At",
         field: "updatedAt",
         valueFormatter: (params) => formatDate(params.value),
-        width: 160,
+        width: 150,
         filter: "agDateColumnFilter",
         filterParams: dateFilterParams,
       },
     {
       headerName: "Actions",
       field: "actions",
-      width: 140,
+      width: 160,
       cellRenderer: (params) => (
         <Popconfirm
           title="Are you sure you want to remove this student?"

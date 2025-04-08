@@ -55,7 +55,7 @@
 
   .detail-table {
     min-height: 250px;
-    width: 100%;
+    width: 98.5%;
     flex: 1;
     max-height: 400px; 
     overflow-y: auto; 
