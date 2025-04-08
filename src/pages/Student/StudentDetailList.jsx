@@ -100,7 +100,7 @@ const StudentDetailList = ({ studentId }) => {
   
 
   const columnDefs = useMemo(() => [
-    { headerName: "ID", field: "id", width: 80, width: 140, sortable: true, filterParams: numberFilterParams },
+    { headerName: "ID", field: "id", width: 80, sortable: true, filterParams: numberFilterParams },
     { headerName: "Class Name", field: "name", width: 140, filter: true, filterParams: textFilterParams },
     { headerName: "Capacity", field: "capacity", width: 140, sortable: true, filterParams: numberFilterParams },
     {
