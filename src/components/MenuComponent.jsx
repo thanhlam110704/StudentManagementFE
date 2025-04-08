@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { UserOutlined, BookOutlined, HomeOutlined } from "@ant-design/icons";
 import { Menu, Layout, Switch } from "antd";
-import "../../styles/menu.component.css";
+import "../styles/menu.component.css";
 
 const { Sider } = Layout;
 

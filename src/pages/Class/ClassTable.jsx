@@ -2,13 +2,20 @@ import React, { useState, useEffect, useMemo, useCallback, useRef } from "react"
 import { Button, Modal, Popconfirm, message, Pagination } from "antd";
 import { PlusOutlined, EditOutlined, DeleteOutlined, InfoOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
-import AgGridTable from "../../components/common/AgGridTable";
+import { AgGridReact } from "@ag-grid-community/react"; 
+import { ModuleRegistry } from "@ag-grid-community/core";
+import { ClientSideRowModelModule } from "@ag-grid-community/client-side-row-model"; 
+import "ag-grid-community/styles/ag-grid.css";
+import "ag-grid-community/styles/ag-theme-alpine.css";
 import ClassForm from "./ClassForm.jsx";
 import { textFilterParams, dateFilterParams, numberFilterParams } from "../../utils/filterParams.ts";
 import { deleteClass, getClasses, getClassDetail } from "../../api/classApi";
-import {getFilterModel } from '../../utils/handleFilter.ts';
+import { getFilterModel } from '../../utils/filterModel.js';
 import { formatDate } from "../../utils/dateConvert.js";
 import "../../styles/table.component.css";
+
+
+ModuleRegistry.registerModules([ClientSideRowModelModule]);
 
 const ClassTable = () => {
     const [gridApi, setGridApi] = useState(null);
@@ -19,7 +26,7 @@ const ClassTable = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
     const [totalItems, setTotalItems] = useState(0);
-    const [filter, setFilter] = useState({});
+    const [filter, setFilter] = useState([]);
     const [sortBy, setSortBy] = useState("");
     const [sortDirection, setSortDirection] = useState("");
     const hasFetched = useRef(false);
@@ -29,9 +36,8 @@ const ClassTable = () => {
         setLoading(true);
         try {
             const data = await getClasses(currentPage, pageSize, filter, sortBy, sortDirection);
-            console.log("🚀 ~ loadClasses ~ data:", data)
             setClasses(data.data);
-            setTotalItems(data.totalItems);
+            setTotalItems(data.totalRecords);
             hasFetched.current = false;
         } catch (error) {
             message.error("Fail to load classes");
@@ -50,14 +56,15 @@ const ClassTable = () => {
     const handlePageChange = (page, size) => {
         setCurrentPage(page);
         setPageSize(size);
+        loadClasses(); 
     };
 
     const handleFilterChange = () => {
-        const filters = getFilterModel(gridApi);  
+        const filters = getFilterModel(gridApi); 
         if (filters.length > 0) {
-            setFilter(filters[0]);  
+            setFilter(filters);  
         } else {
-            setFilter({});
+            setFilter([]);
         }
     };
 
@@ -97,9 +104,9 @@ const ClassTable = () => {
     }, [loadClasses]);
 
     const columnDefs = useMemo(() => [
-        { headerName: "ID", field: "id", width: 100},
+        { headerName: "ID", field: "id", width: 100 },
         { headerName: "Class Name", field: "name", width: 140, filter: true, filterParams: textFilterParams },
-        { headerName: "Capacity", field: "capacity", width: 140, sortable: true,filterParams:numberFilterParams },
+        { headerName: "Capacity", field: "capacity", width: 140, sortable: true, filterParams: numberFilterParams },
         {
             headerName: "Start Date",
             field: "startDate",
@@ -166,29 +173,35 @@ const ClassTable = () => {
                 </Button>
             </div>
 
-            <AgGridTable
-                loading={loading}
-                rowData={classes}
-                columnDefs={columnDefs}
-                onFilterChange={handleFilterChange}
-                onSortChange={handleSortChange}
-                sortModel={[{ colId: sortBy, sort: sortDirection.toLowerCase() }]}
-                onGridReady={(params) => {
-                    setGridApi(params.api);
-                }}
-            />
             
+            <div className="ag-theme-alpine">
+                <AgGridReact
+                    rowData={classes}
+                    columnDefs={columnDefs}
+                    loading={loading}
+                    pagination={true}
+                    paginationPageSize={pageSize}
+                    suppressPaginationPanel={true}
+                    defaultColDef={{ resizable: true, sortable: true, filter: true }}
+                    domLayout="autoHeight"
+                    onGridReady={(params) => setGridApi(params.api)}
+                    onFilterChanged={handleFilterChange}
+                    onSortChanged={handleSortChange}
+                    sortModel={[{ colId: sortBy, sort: sortDirection.toLowerCase() }]}
+                />
+            </div>
+
             <div className="pagination-container">
                 <Pagination
                     current={currentPage}
                     pageSize={pageSize}
-                    total={totalItems}
-                    showSizeChanger
+                    total={totalItems} 
+                    showSizeChanger={true}
                     pageSizeOptions={["5", "10", "20", "50"]}
                     onChange={handlePageChange}
                 />
             </div>
-            
+
             <Modal
                 title={editingClass ? "Edit Class" : "Add Class"}
                 open={isModalOpen}

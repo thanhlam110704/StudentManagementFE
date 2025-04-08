@@ -1,19 +1,26 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { Button, Popconfirm, message, Pagination } from "antd";
 import { PlusOutlined, DeleteOutlined } from "@ant-design/icons";
 import { AgGridReact } from "@ag-grid-community/react"; 
 import AddStudentModal from "./AddStudentModal";
 import { fetchAvailableStudents, removeStudentFromClass } from "../../api/classStudentApi";
-import { formatDate } from "../../utils/dateConvert";
 import { getStudentsListofClass } from "../../api/classApi";
+import { textFilterParams, dateFilterParams } from "../../utils/filterParams.ts";
+import { getFilterModel } from '../../utils/filterModel.js';
+import { formatDate } from "../../utils/dateConvert.js";
 
 const ClassDetailList = ({ classId }) => {
+  const [gridApi, setGridApi] = useState(null);
   const [students, setStudents] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [availableStudents, setAvailableStudents] = useState([]);
-  const [totalItems, setTotalItems] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [totalItems, setTotalItems] = useState(0);
+  const [filter, setFilter] = useState([]);
+  const [sortBy, setSortBy] = useState("");
+  const [sortDirection, setSortDirection] = useState("");
   const hasFetched = useRef(false);
 
   const loadAvailableStudents = useCallback(async () => {
@@ -25,22 +32,26 @@ const ClassDetailList = ({ classId }) => {
     }
   }, [classId]);
 
-  const refreshStudents = useCallback(async (page = 1, size = 10) => {
+  const loadStudentList = useCallback(async () => {
+    setLoading(true);
     try {
-      const response = await getStudentsListofClass(classId, page, size);
-      setStudents(response.data);
-      setTotalItems(response.totalItems);
+      const data = await getStudentsListofClass(classId,currentPage, pageSize, filter, sortBy, sortDirection);
+      setStudents(data.data);
+      setTotalItems(data.totalRecords);
+      hasFetched.current = false;
     } catch (error) {
-      message.error("Lỗi khi tải danh sách sinh viên!");
+      message.error("Fail to load list of student!");
+    }finally {
+      setLoading(false);
     }
-  }, [classId]);
+  }, [classId, currentPage, pageSize, filter, sortBy, sortDirection]);
 
   useEffect(() => {
     if (!hasFetched.current) {
+      loadStudentList();
       hasFetched.current = true;
-      refreshStudents(currentPage, pageSize);
     }
-  }, [refreshStudents, currentPage, pageSize]);
+  }, [loadStudentList]);
 
   useEffect(() => {
     if (isModalOpen) {
@@ -48,51 +59,71 @@ const ClassDetailList = ({ classId }) => {
     }
   }, [isModalOpen, loadAvailableStudents]);
 
-  const handleRemoveStudent = async (studentId) => {
+  const handleRemoveStudent = useCallback(async (studentId) => {
     try {
-      await removeStudentFromClass(classId, studentId);
+      await removeStudentFromClass(studentId, classId);
       message.success("Đã xóa sinh viên thành công!");
-      refreshStudents(currentPage, pageSize);
+      loadStudentList();
     } catch (error) {
       message.error("Lỗi khi xóa sinh viên!");
     }
-  };
+  }, [classId, loadStudentList]);
 
   const handlePageChange = (page, size) => {
     setCurrentPage(page);
     setPageSize(size);
-    refreshStudents(page, size);
   };
 
-  const columnDefs = [
-    { headerName: "ID", field: "id", width: 80 },
-    { headerName: "Name", field: "name", width: 140 },
-    { headerName: "Email", field: "email", width: 140 },
-    { headerName: "Phone", field: "phone", width: 140 },
-    {
-      headerName: "Gender",
-      field: "gender",
-      width: 120,
-      cellRenderer: (params) => (params.value ? "Male" : "Female"),
-    },
-    {
-      headerName: "Birth Date",
-      field: "dateOfBirth",
-      valueFormatter: (params) => formatDate(params.value),
-      width: 140,
-    },
-    {
-      headerName: "Created At",
-      field: "createdAt",
-      valueFormatter: (params) => formatDate(params.value),
-      width: 140,
-    },
-    {
-      headerName: "Updated At",
-      field: "updatedAt",
-      valueFormatter: (params) => formatDate(params.value),
-      width: 140,
-    },
+  const handleFilterChange = () => {
+    const filters = getFilterModel(gridApi); 
+    if (filters.length > 0) {
+        setFilter(filters);  
+    } else {
+        setFilter([]);
+    }
+  };
+
+  const handleSortChange = (params) => {
+    const columnState = params.api.getColumnState();
+    const sortedColumn = columnState.find((col) => col.sort === "asc" || col.sort === "desc");
+    if (sortedColumn) {
+      setSortBy(sortedColumn.colId);
+      setSortDirection(sortedColumn.sort);
+    } else {
+      setSortBy('');
+      setSortDirection('');
+    }
+  };
+
+  const columnDefs = useMemo(() => [
+      { headerName: "ID", field: "id", width: 80 },
+      { headerName: "Full Name", field: "name", width: 160, filter: true, filterParams: textFilterParams },
+      { headerName: "Email", field: "email", width: 180, filter: true, filterParams: textFilterParams },
+      { headerName: "Phone", field: "phone", width: 140, filter: true, filterParams: textFilterParams },
+      {
+        headerName: "Date of Birth",
+        field: "dateOfBirth",
+        valueFormatter: (params) => formatDate(params.value),
+        width: 160,
+        filter: "agDateColumnFilter",
+        filterParams: dateFilterParams,
+      },
+      {
+        headerName: "Created At",
+        field: "createdAt",
+        valueFormatter: (params) => formatDate(params.value),
+        width: 160,
+        filter: "agDateColumnFilter",
+        filterParams: dateFilterParams,
+      },
+      {
+        headerName: "Updated At",
+        field: "updatedAt",
+        valueFormatter: (params) => formatDate(params.value),
+        width: 160,
+        filter: "agDateColumnFilter",
+        filterParams: dateFilterParams,
+      },
     {
       headerName: "Actions",
       field: "actions",
@@ -106,7 +137,7 @@ const ClassDetailList = ({ classId }) => {
         </Popconfirm>
       ),
     },
-  ];
+  ], [handleRemoveStudent]);
 
   return (
     <>
@@ -121,14 +152,32 @@ const ClassDetailList = ({ classId }) => {
         Add Student
       </Button>
 
-      <AgGridReact rowData={students} columnDefs={columnDefs} />
+      <div className="ag-theme-alpine">
+        <AgGridReact
+          className="detail-table"
+          rowData={students}
+          columnDefs={columnDefs}
+          loading={loading}
+          pagination={true}
+          paginationPageSize={pageSize}
+          suppressPaginationPanel={true}
+          defaultColDef={{ resizable: true, sortable: true, filter: true }}
+          domLayout="autoHeight"
+          onGridReady={(params) => setGridApi(params.api)}
+          onFilterChanged={handleFilterChange}
+          onSortChanged={handleSortChange}
+          sortModel={[{ colId: sortBy, sort: sortDirection.toLowerCase() }]}
+        />
+      </div>
 
-      {/* Pagination */}
+
+      
       <div className="pagination-container-detail">
         <Pagination
           current={currentPage}
           pageSize={pageSize}
           total={totalItems}
+          pageSizeOptions={["5", "10", "20", "50"]}
           onChange={handlePageChange}
           showSizeChanger
         />
@@ -140,7 +189,7 @@ const ClassDetailList = ({ classId }) => {
         availableStudents={availableStudents}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onSuccess={() => refreshStudents(currentPage, pageSize)}
+        onSuccess={() => loadStudentList()}
       />
     </>
   );

@@ -1,19 +1,21 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Form, Input, DatePicker, Button, Radio, message } from "antd";
 import dayjs from "dayjs";
 import { createStudent, updateStudent } from "../../api/studentApi";
-import { nameRule, emailRule, phoneRule,dateOfBirthRule } from "../../utils/handleValidations";
+import { handleApiError } from "../../utils/handleApiErrors";  
 
 const StudentForm = ({ initialValues, onSuccess }) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = React.useState(false);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (initialValues) {
       form.setFieldsValue({
         ...initialValues,
         dateOfBirth: initialValues.dateOfBirth ? dayjs(initialValues.dateOfBirth) : null,
       });
+    }else {
+      form.resetFields();
     }
   }, [initialValues, form]);
 
@@ -25,17 +27,27 @@ const StudentForm = ({ initialValues, onSuccess }) => {
         dateOfBirth: values.dateOfBirth?.format("YYYY-MM-DD"),
       };
 
+      let response;
       if (initialValues) {
-        await updateStudent(initialValues.id, formattedValues);
-        message.success("Student updated successfully");
+        response = await updateStudent(initialValues.id, formattedValues);
       } else {
-        await createStudent(formattedValues);
-        message.success("Student created successfully");
+        response = await createStudent(formattedValues);
       }
 
-      onSuccess();
+      // Xử lý lỗi từ API và cập nhật vào form
+      if (response?.errors) {
+        handleApiError({ response }, form);
+      } else {
+        message.success(initialValues ? "Student updated successfully" : "Student created successfully");
+        onSuccess();
+      }
     } catch (error) {
-      message.error("Failed to save student");
+          message.error("Failed to save class");
+      
+          const fieldErrors = handleApiError(error, form); 
+          if (!fieldErrors) {
+            message.error("An unexpected error occurred. Please try again.");
+          }
     } finally {
       setLoading(false);
     }
@@ -43,31 +55,31 @@ const StudentForm = ({ initialValues, onSuccess }) => {
 
   return (
     <Form form={form} layout="vertical" onFinish={handleSubmit}>
-      <Form.Item name="name" label="Full Name" rules={nameRule}>
-        <Input />
+      <Form.Item name="name" label="Full Name">
+        <Input placeholder="Enter full name" />
       </Form.Item>
 
-      <Form.Item name="email" label="Email" rules={emailRule}>
-        <Input />
+      <Form.Item name="email" label="Email">
+        <Input placeholder="Enter email" />
       </Form.Item>
 
-      <Form.Item name="phone" label="Phone Number" rules={phoneRule}>
-        <Input maxLength={10} />
+      <Form.Item name="phone" label="Phone Number">
+        <Input placeholder="Enter phone number" />
       </Form.Item>
 
-      <Form.Item
-        name="gender"
-        label="Gender"
-        rules={[{ required: true, message: "Please select gender" }]}
-      >
+      <Form.Item name="gender" label="Gender">
         <Radio.Group>
           <Radio value={true}>Male</Radio>
           <Radio value={false}>Female</Radio>
         </Radio.Group>
       </Form.Item>
 
-      <Form.Item name="dateOfBirth" label="Birth Date" rules={dateOfBirthRule}>
-        <DatePicker format="DD/MM/YYYY" style={{ width: "100%" }} />
+      <Form.Item name="dateOfBirth" label="Birth Date">
+        <DatePicker
+          format="DD/MM/YYYY"
+          style={{ width: "100%" }}
+          placeholder="Select birth date"
+        />
       </Form.Item>
 
       <Form.Item>

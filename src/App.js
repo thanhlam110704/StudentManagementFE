@@ -1,7 +1,7 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Layout } from "antd";
-import MenuComponent from "./components/common/MenuComponent";
+import MenuComponent from "./components/MenuComponent";
 import StudentTable from "./pages/Student/StudentTable";
 import ClassTable from "./pages/Class/ClassTable";
 import StudentDetail from "./pages/Student/StudentDetail";

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Col, Row, Form, Input, DatePicker, Button, message } from "antd";
 import dayjs from "dayjs";
 import { createClass, updateClass } from "../../api/classApi";
-import { nameRule, capacityRule ,startDateRule, endDateRule} from "../../utils/handleValidations";
+import { handleApiError } from "../../utils/handleApiErrors"; 
 
 const ClassForm = ({ initialValues, onSuccess }) => {
   const [form] = Form.useForm();
@@ -28,59 +28,71 @@ const ClassForm = ({ initialValues, onSuccess }) => {
         startDate: values.startDate?.format("YYYY-MM-DD"),
         endDate: values.endDate?.format("YYYY-MM-DD"),
       };
-
+  
+      let response;
       if (initialValues) {
-        await updateClass(initialValues.id, formattedValues);
-        message.success("Class updated successfully");
+        response = await updateClass(initialValues.id, formattedValues);
       } else {
-        await createClass(formattedValues);
-        message.success("Class created successfully");
+        response = await createClass(formattedValues);
       }
-
-      onSuccess();
+  
+      if (response?.errors) {
+        handleApiError({ response }, form); 
+      } else {
+        message.success("Class saved successfully");
+        onSuccess();
+      }
     } catch (error) {
       message.error("Failed to save class");
+  
+      const fieldErrors = handleApiError(error, form); 
+      if (!fieldErrors) {
+        message.error("An unexpected error occurred. Please try again.");
+      }
     } finally {
       setLoading(false);
     }
   };
+  
 
   return (
     <Form form={form} layout="vertical" onFinish={handleSubmit}>
       <Form.Item
         name="name"
         label="Class Name"
-        rules={nameRule}
       >
-        <Input />
+        <Input placeholder="Enter class name" />
       </Form.Item>
 
       <Form.Item
         name="capacity"
         label="Capacity"
-        rules={capacityRule}
       >
-        <Input type="number" />
+        <Input type="number" placeholder="Enter class capacity" />
       </Form.Item>
-
       
-
       <Row gutter={16}> 
         <Col span={12}>
           <Form.Item 
             name="startDate" 
-            label="Start Date" 
-            rules={startDateRule({ getFieldValue: form.getFieldValue })}>
-            <DatePicker format="DD/MM/YYYY" style={{ width: "100%" }} />
+            label="Start Date">
+            <DatePicker 
+              format="DD/MM/YYYY" 
+              style={{ width: "100%" }} 
+              placeholder="Select start date" 
+            />
           </Form.Item>
         </Col>
 
         <Col span={12}>
           <Form.Item 
             name="endDate" 
-            label="End Date" 
-            rules={endDateRule({ getFieldValue: form.getFieldValue })}>
-            <DatePicker format="DD/MM/YYYY" style={{ width: "100%" }} />
+            label="End Date">
+            <DatePicker 
+              format="DD/MM/YYYY" 
+              style={{ width: "100%" }} 
+              placeholder="Select end date" 
+            />
           </Form.Item>
         </Col>
       </Row>

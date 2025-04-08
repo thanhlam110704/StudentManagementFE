@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import DetailComponent from "../../components/common/DetailComponent";
+import DetailComponent from "../../components/DetailComponent";
 import StudentDetailInfo from "../../pages/Student/StudentDetailInfo";
 import StudentDetailList from "../../pages/Student/StudentDetailList";
 
@@ -18,7 +18,7 @@ const StudentDetail = () => {
   const tabs = [
     {
       label: "Student Information", 
-      key: "StudentInformation", 
+      key: "InfomationStudent", 
       component: <StudentDetailInfo studentId={id} /> 
     },
     {

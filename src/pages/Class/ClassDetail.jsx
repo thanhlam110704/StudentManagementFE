@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import DetailComponent from "../../components/common/DetailComponent";
+import DetailComponent from "../../components/DetailComponent";
 import ClassDetailInfo from "../../pages/Class/ClassDetailInfo";
 import ClassDetailList from "../../pages/Class/ClassDetailList";
 

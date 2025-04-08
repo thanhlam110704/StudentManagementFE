@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Select, Button, message } from "antd";
-import CustomModal from "../../components/common/CustomModal";
+import CustomModal from "../../components/CustomModal";
 import { addStudentToClass } from "../../api/classStudentApi";
 
 const AddClassModal = ({ studentId, availableClasses, isOpen, onClose, onSuccess }) => {

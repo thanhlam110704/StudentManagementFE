@@ -1,20 +1,22 @@
 import axios from "axios";
 
 const API_URL = "https://localhost:7063/api";
-export const getStudents = async (page = 1, pageSize = 10, filter = {}, sortBy = '', sortDirection = '') => {
+export const getStudents = async (page = 1, pageSize = 10, filters = [], sortBy = '', sortDirection = '') => {
   const params = {
-      Page: page,
-      PageSize: pageSize,
-      sortBy,
-      sortDirection,
+    Top: pageSize,          
+    Offset: (page - 1) * pageSize,
+    SortBy: sortBy, 
+    SortDirection: sortDirection,  
   };
-  if (filter.field && filter.value && filter.operator) {
-      params["filters[field]"] = filter.field;
-      params["filters[value]"] = filter.value;
-      params["filters[operator]"] = filter.operator;
-  }
- 
 
+  filters.forEach((filter, index) => {
+    if (filter.field && filter.value && filter.operator) {
+      params[`filters[${index}][field]`] = filter.field;
+      params[`filters[${index}][value]`] = filter.value;
+      params[`filters[${index}][operator]`] = filter.operator;
+    }
+  });
+ 
   const response = await axios.get(`${API_URL}/Student`, { params });
   return response.data;
 };
@@ -24,10 +26,23 @@ export const getStudents = async (page = 1, pageSize = 10, filter = {}, sortBy =
     return response.data;
   };
 
-export const getClassesListofStudent = async (id, page = 1, pageSize = 10) => {
-  const response = await axios.get(`${API_URL}/ClassStudent/student/${id}`,{
-    params: { page, pageSize }, 
+export const getClassesListofStudent = async (id, page = 1, pageSize = 10, filters = [], sortBy = '', sortDirection = '' )=> {
+  const params = {
+    Top: pageSize,          
+    Offset: (page - 1) * pageSize,
+    SortBy: sortBy, 
+    SortDirection: sortDirection,
+  };
+
+  filters.forEach((filter, index) => {
+    if (filter.field && filter.value && filter.operator) {
+      params[`filters[${index}][field]`] = filter.field;
+      params[`filters[${index}][value]`] = filter.value;
+      params[`filters[${index}][operator]`] = filter.operator;
+    }
   });
+  const response = await axios.get(`${API_URL}/ClassStudent/student/${id}`, { params });
+
   return response.data;
 };
 
