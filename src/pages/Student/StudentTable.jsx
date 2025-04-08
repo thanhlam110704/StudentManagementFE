@@ -53,7 +53,6 @@ const StudentTable = () => {
   const handlePageChange = (page, size) => {
     setCurrentPage(page);
     setPageSize(size);
-    loadStudents();
   };
 
   const handleFilterChange = () => {

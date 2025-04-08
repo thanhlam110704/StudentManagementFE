@@ -56,7 +56,6 @@ const ClassTable = () => {
     const handlePageChange = (page, size) => {
         setCurrentPage(page);
         setPageSize(size);
-        loadClasses(); 
     };
 
     const handleFilterChange = () => {
@@ -205,7 +204,10 @@ const ClassTable = () => {
             <Modal
                 title={editingClass ? "Edit Class" : "Add Class"}
                 open={isModalOpen}
-                onCancel={() => setIsModalOpen(false)}
+                onCancel={() => {
+                    setIsModalOpen(false);
+                    setEditingClass(null);
+                  }}
                 footer={null}
             >
                 <ClassForm initialValues={editingClass} onSuccess={loadClasses} />
