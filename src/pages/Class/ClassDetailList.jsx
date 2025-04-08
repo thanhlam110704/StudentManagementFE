@@ -96,7 +96,7 @@ const ClassDetailList = ({ classId }) => {
   };
 
   const columnDefs = useMemo(() => [
-      { headerName: "ID", field: "id", width: 80, width: 140, sortable: true, filterParams: numberFilterParams },
+      { headerName: "ID", field: "id", width: 80, sortable: true, filterParams: numberFilterParams },
       { headerName: "Full Name", field: "name", width: 160, filter: true, filterParams: textFilterParams },
       { headerName: "Email", field: "email", width: 160, filter: true, filterParams: textFilterParams },
       { headerName: "Phone", field: "phone", width: 160, filter: true, filterParams: textFilterParams },
